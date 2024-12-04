@@ -8,12 +8,33 @@ val splitRgx = Regex("\\s+")
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
 
-    val lines = File("src/main/resources/day2.txt")
+    val lines = File("src/main/resources/day1.txt")
         .readLines()
 
-    val day2 = day2(lines)
+    val day11 = day11(lines)
 
-    println(day2)
+    println(day11)
+}
+
+fun day11(lines: List<String>): Long {
+    val (left, right) = lines.map { line ->
+        val v1 = line.substringBefore(" ").trim()
+        val v2 = line.substringAfterLast(" ").trim()
+        v1.toLong() to v2.toLong()
+    }.unzip()
+
+    val frequencies = right.groupingBy { it }.eachCount()
+    var score = 0L
+
+    repeat(left.size) {
+        val item = left[it]
+        val frequency = frequencies.getOrDefault(item, 0)
+
+        score += (item * frequency )
+    }
+
+    return score
+
 }
 
 fun day2(reports: List<String>): Int {
