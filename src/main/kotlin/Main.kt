@@ -4,37 +4,35 @@ import java.io.File
 import kotlin.math.abs
 
 
-fun readInput(filename: String): List<String> = File("src/main/resources/$filename").readLines()
+fun readInput(filename: String): File = File("src/main/resources/$filename")
+
 fun main() {
-    day1(readInput("day1.txt"))
-    day2(readInput("day2.txt"))
+    day1(readInput("day1.txt").readLines())
+    day2(readInput("day2.txt").readLines())
+    day3(readInput("day3.txt").readText())
 }
 
-fun day1(input: List<String>) {
-    val (left, right) = input.map { line ->
-        val v1 = line.substringBefore(" ").trim()
-        val v2 = line.substringAfterLast(" ").trim()
-        v1.toLong() to v2.toLong()
-    }.unzip()
+fun day3(input: String) {
+    val matches = "mul\\(\\d+,\\d+\\)".toRegex().findAll(input)
 
-    val frequencies = right.groupingBy { it }.eachCount()
+    val result = matches.sumOf {
 
-    val result = left.sumOf {
-         val frequency = frequencies.getOrDefault(it, 0)
-        it * frequency
+        val n1 = it.value
+            .substringAfter("mul(")
+            .substringBefore(',')
+            .trim()
+            .toInt()
+
+        val n2 = it.value
+            .substringAfterLast(',')
+            .substringBefore(')')
+            .trim()
+            .toInt()
+        n1 * n2
     }
 
-    println("Day1-1 Result: $result")
+    println("Day3-1 Result: $result")
 
-    val result2 = left
-        .sorted()
-        .zip(
-            right.sorted()
-        ).sumOf { (a, b) ->
-            abs(a - b)
-        }
-
-    println("Day1-2 Result: $result2")
 }
 
 fun day2(input: List<String>) {
@@ -62,4 +60,31 @@ fun day2(input: List<String>) {
     }
 
     println("Day2-2 Result: $part2")
+}
+
+fun day1(input: List<String>) {
+    val (left, right) = input.map { line ->
+        val v1 = line.substringBefore(" ").trim()
+        val v2 = line.substringAfterLast(" ").trim()
+        v1.toLong() to v2.toLong()
+    }.unzip()
+
+    val frequencies = right.groupingBy { it }.eachCount()
+
+    val result = left.sumOf {
+         val frequency = frequencies.getOrDefault(it, 0)
+        it * frequency
+    }
+
+    println("Day1-1 Result: $result")
+
+    val result2 = left
+        .sorted()
+        .zip(
+            right.sorted()
+        ).sumOf { (a, b) ->
+            abs(a - b)
+        }
+
+    println("Day1-2 Result: $result2")
 }
