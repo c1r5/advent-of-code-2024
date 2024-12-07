@@ -3,77 +3,63 @@ package dev.eric.java
 import java.io.File
 import kotlin.math.abs
 
-val splitRgx = Regex("\\s+")
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
+fun readInput(filename: String): List<String> = File("src/main/resources/$filename").readLines()
 fun main() {
-
-    val lines = File("src/main/resources/day1.txt")
-        .readLines()
-
-    val day11 = day11(lines)
-
-    println(day11)
+    day1(readInput("day1.txt"))
+    day2(readInput("day2.txt"))
 }
 
-fun day11(lines: List<String>): Long {
-    val (left, right) = lines.map { line ->
+fun day1(input: List<String>) {
+    val (left, right) = input.map { line ->
         val v1 = line.substringBefore(" ").trim()
         val v2 = line.substringAfterLast(" ").trim()
         v1.toLong() to v2.toLong()
     }.unzip()
 
     val frequencies = right.groupingBy { it }.eachCount()
-    var score = 0L
 
-    repeat(left.size) {
-        val item = left[it]
-        val frequency = frequencies.getOrDefault(item, 0)
-
-        score += (item * frequency )
+    val result = left.sumOf {
+         val frequency = frequencies.getOrDefault(it, 0)
+        it * frequency
     }
 
-    return score
+    println("Day1-1 Result: $result")
 
-}
-
-fun day2(reports: List<String>): Int {
-    return reports.filter {line ->
-        val report = line.split(splitRgx).map(String::toInt)
-        val diffBetween = report.zipWithNext { a, b ->
+    val result2 = left
+        .sorted()
+        .zip(
+            right.sorted()
+        ).sumOf { (a, b) ->
             abs(a - b)
         }
 
-        if (!diffBetween.all { it in 1..3 }) return@filter false
-
-        val isIncreaseOnly = report.zipWithNext { a, b ->
-            b > a
-        }.all { it }
-
-        val isDecreaseOnly = report.zipWithNext { a, b ->
-            a > b
-        }.all { it }
-
-        isDecreaseOnly || isIncreaseOnly
-    }.size
+    println("Day1-2 Result: $result2")
 }
 
-fun day1(lines: List<String>): Int { // 2970687
-    val right = mutableListOf<Int>()
-    val left = mutableListOf<Int>()
-    var distancesBetween = 0
-    lines.forEach { line ->
-        val (r, l) = line.split(splitRgx)
-
-        right.add(r.toInt())
-        left.add(l.toInt())
+fun day2(input: List<String>) {
+    fun isSafe(report: List<Int>): Boolean {
+        val isIncreasing = report.zipWithNext().all { (a, b) -> b > a }
+        val isDecreasing = report.zipWithNext().all {(a, b) -> b < a}
+        val differencesOk = report.zipWithNext().all { (a, b) -> abs(b - a) in 1..3 }
+        return (isIncreasing || isDecreasing) && differencesOk
     }
-    right.sort()
-    left.sort()
-    repeat(right.size) {
-        val distance = abs(left[it] - right[it])
-        distancesBetween += distance
+    val reports = input.map { line -> line.split(" ").map(String::toInt) }
+
+    val part1 = reports.count { report -> isSafe(report) }
+
+    println("Day2-1 Result: $part1")
+
+    val part2 = reports.count { report ->
+        if (isSafe(report)) return@count true
+
+        for (i in report.indices) {
+            val newReport = report.toMutableList().apply { removeAt(i) }
+            if (isSafe(newReport)) return@count true
+        }
+
+        return@count false
     }
 
-    return distancesBetween
+    println("Day2-2 Result: $part2")
 }
