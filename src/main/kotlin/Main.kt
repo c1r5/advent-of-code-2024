@@ -13,25 +13,38 @@ fun main() {
 }
 
 fun day3(input: String) {
-    val matches = "mul\\(\\d+,\\d+\\)".toRegex().findAll(input)
+    val sumMultipliers = {text: String ->
+        val matchMultiplier = "mul\\(\\d+,\\d+\\)".toRegex().findAll(text)
+        matchMultiplier.sumOf {
 
-    val result = matches.sumOf {
+            val n1 = it.value
+                .substringAfter("mul(")
+                .substringBefore(',')
+                .trim()
+                .toInt()
 
-        val n1 = it.value
-            .substringAfter("mul(")
-            .substringBefore(',')
-            .trim()
-            .toInt()
-
-        val n2 = it.value
-            .substringAfterLast(',')
-            .substringBefore(')')
-            .trim()
-            .toInt()
-        n1 * n2
+            val n2 = it.value
+                .substringAfterLast(',')
+                .substringBefore(')')
+                .trim()
+                .toInt()
+            n1 * n2
+        }
     }
 
-    println("Day3-1 Result: $result")
+
+    val part1 = sumMultipliers(input)
+
+    println("Day3-1 Result: $part1")
+
+    val explode = input.split("do()")
+
+    val part2 = explode.sumOf {line ->
+        val multipliers = line.split("don't()").map(String::trim)[0]
+        sumMultipliers(multipliers)
+    }
+
+    println("Day3-2 Result: $part2")
 
 }
 

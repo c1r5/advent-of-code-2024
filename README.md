@@ -6,6 +6,6 @@
 - [X] Day 2: --- Day 2: Red-Nosed Reports ---
   - [X] Part 1
   - [X] Part 2
-- [ ] Day 3: --- Day 3: Mull It Over ---
+- [X] Day 3: --- Day 3: Mull It Over ---
   - [X] Part 1
-  - [ ] Part 2
+  - [X] Part 2
