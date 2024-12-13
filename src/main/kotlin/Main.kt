@@ -4,18 +4,6 @@ import java.io.File
 import kotlin.math.abs
 
 
-enum class Directions (val dx: Int, val dy: Int) {
-    START(0, 0),
-    RIGHT(1, 0),
-    LEFT(-1, 0),
-    UP(0, -1),
-    DOWN(0, 1),
-    LEFT_DOWN(-1, -1),
-    RIGHT_DOWN(1, -1),
-    LEFT_UP(-1, 1),
-    RIGHT_UP(1, 1),
-}
-
 fun readInput(filename: String): File = File("src/main/resources/$filename")
 
 fun main() {
@@ -27,20 +15,42 @@ fun main() {
 
 fun day4(input: String) {
     val grid = input.lines()
+    val coordinates = grid.flatMapIndexed { rowIndex: Int, row: String ->
+        row.indices.map { col ->
+            rowIndex to col
+        }
+    }
+    val directions = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1, -1 to -1, 1 to -1, -1 to 1, 1 to 1)
+    val diagonals = listOf(
+        listOf(-1 to -1, 0 to 0, 1 to 1),
+        listOf(1 to -1, 0 to 0, -1 to 1)
+    )
 
-    val part1 = grid.flatMapIndexed { line, s ->
-        s.mapIndexed { index, c ->
-            index to c
-        }.filter { it.second == 'X' }.map { line to it.first }
-    }.sumOf {p ->
-        Directions.entries.count { direction ->
-            "XMAS".indices.mapNotNull {
-                grid.getOrNull(p.first + it * direction.dx)?.getOrNull(p.second + it * direction.dy)
-            }.joinToString("") == "XMAS"
+    val part1 = coordinates.filter { (r, c) -> grid[r][c] == 'X' }.sumOf { (x, y) ->
+        directions.count { (dx, dy) ->
+            val positions = "XMAS".indices.map { i ->
+                (x + i * dx) to (y + i * dy)
+            }.filter { (row, col) -> row in grid.indices && col in 0..<grid[0].length }
+
+            val word = positions.map { (row, col) -> grid[row][col] }
+                .joinToString("")
+
+            word == "XMAS"
         }
     }
 
+    val part2 = coordinates.filter { (r, c) -> grid[r][c] == 'A' }.count { (rowIndex, colIndex) ->
+        diagonals.map { directions ->
+            val positions = directions.map {(dx, dy) -> (rowIndex + dx) to (colIndex + dy) }.filter { (row, col) -> row in grid.indices && col in 0..<grid[0].length }
+
+            positions.joinToString("") { (row, col) -> grid[row][col].toString() }.let {
+                it == "MAS" || it == "SAM"
+            }
+        }.all { it }
+    }
+
     println("Day4-1: $part1")
+    println("Day4-2: $part2")
 }
 
 fun day3(input: String) {

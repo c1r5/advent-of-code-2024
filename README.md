@@ -9,3 +9,6 @@
 - [X] Day 3: --- Day 3: Mull It Over ---
   - [X] Part 1
   - [X] Part 2
+- [X] Day 4: --- Day 4: Ceres Search ---
+  - [X] Part 1
+  - [X] Part 2
