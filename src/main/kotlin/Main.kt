@@ -4,12 +4,43 @@ import java.io.File
 import kotlin.math.abs
 
 
+enum class Directions (val dx: Int, val dy: Int) {
+    START(0, 0),
+    RIGHT(1, 0),
+    LEFT(-1, 0),
+    UP(0, -1),
+    DOWN(0, 1),
+    LEFT_DOWN(-1, -1),
+    RIGHT_DOWN(1, -1),
+    LEFT_UP(-1, 1),
+    RIGHT_UP(1, 1),
+}
+
 fun readInput(filename: String): File = File("src/main/resources/$filename")
 
 fun main() {
     day1(readInput("day1.txt").readLines())
     day2(readInput("day2.txt").readLines())
     day3(readInput("day3.txt").readText())
+    day4(readInput("day4.txt").readText())
+}
+
+fun day4(input: String) {
+    val grid = input.lines()
+
+    val part1 = grid.flatMapIndexed { line, s ->
+        s.mapIndexed { index, c ->
+            index to c
+        }.filter { it.second == 'X' }.map { line to it.first }
+    }.sumOf {p ->
+        Directions.entries.count { direction ->
+            "XMAS".indices.mapNotNull {
+                grid.getOrNull(p.first + it * direction.dx)?.getOrNull(p.second + it * direction.dy)
+            }.joinToString("") == "XMAS"
+        }
+    }
+
+    println("Day4-1: $part1")
 }
 
 fun day3(input: String) {
@@ -35,7 +66,7 @@ fun day3(input: String) {
 
     val part1 = sumMultipliers(input)
 
-    println("Day3-1 Result: $part1")
+    println("Day3-1: $part1")
 
     val explode = input.split("do()")
 
@@ -44,7 +75,7 @@ fun day3(input: String) {
         sumMultipliers(multipliers)
     }
 
-    println("Day3-2 Result: $part2")
+    println("Day3-2: $part2")
 
 }
 
@@ -59,7 +90,7 @@ fun day2(input: List<String>) {
 
     val part1 = reports.count { report -> isSafe(report) }
 
-    println("Day2-1 Result: $part1")
+    println("Day2-1: $part1")
 
     val part2 = reports.count { report ->
         if (isSafe(report)) return@count true
@@ -72,7 +103,7 @@ fun day2(input: List<String>) {
         return@count false
     }
 
-    println("Day2-2 Result: $part2")
+    println("Day2-2: $part2")
 }
 
 fun day1(input: List<String>) {
@@ -89,7 +120,7 @@ fun day1(input: List<String>) {
         it * frequency
     }
 
-    println("Day1-1 Result: $result")
+    println("Day1-1: $result")
 
     val result2 = left
         .sorted()
@@ -99,5 +130,5 @@ fun day1(input: List<String>) {
             abs(a - b)
         }
 
-    println("Day1-2 Result: $result2")
+    println("Day1-2: $result2")
 }
